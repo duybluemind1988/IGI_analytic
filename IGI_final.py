@@ -5,26 +5,15 @@ from datetime import datetime, timedelta
 import seaborn as sns; sns.set()
 import pandas as pd
 import numpy as np
-import matplotlib.pyplot as plt
 
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
-import plotly.express as px
-from plotly.offline import iplot
-import pandas as pd
+
 #import statistics as st
-from statsmodels.tsa.arima_model import ARIMA
-import statsmodels.api as sm
-from statsmodels.graphics.tsaplots import plot_acf
-from statsmodels.stats.diagnostic import acorr_ljungbox
-import scipy.stats as scs
-from math import sqrt
-from sklearn.metrics import mean_squared_error,mean_absolute_error
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import MinMaxScaler,StandardScaler
+
 import warnings
 warnings.filterwarnings("ignore")
-import sys
+
 import glob
 from fbprophet import Prophet
 
@@ -344,54 +333,7 @@ start_date= st.text_input("Please input start Date (Ex: 2018, 2018/07, 2018/07/3
 end_date= st.text_input("Please input end Date (Ex:  2019, 2019/08, 2018/08/20)")
 
 #print(base_file)
-#---------------------------Box chart--------------------------------------#
-st.header("Box chart")
-@st.cache(suppress_st_warning=True,allow_output_mutation=True)
-def box_chart(base_file,name_list):
-    
-    df_dict=base_file
-    fig = make_subplots(          # Dim name
-        rows=len(df_dict), cols=1,
-        #shared_xaxes=True, # share same axis
-        #vertical_spacing=0.05, # adjust spacing between charts
-        #column_widths=[0.8, 0.2],
-        #subplot_titles=(list(df_dict.keys()))
-        subplot_titles=(name_list)
-    )
-    i=1
-    for name in list(df_dict.keys()): #also group
-      df=df_dict[name]
-      df=df.sort_values(by=['Date'])
-      non_object_column=list(df.select_dtypes(exclude=['object']).columns)
-      for a in df.columns[1:]:
-        if a in non_object_column :
-          df[a] = df[a].round(decimals=3)
-      df=df.reset_index(drop=True)
-      df=df.set_index('Date')
-      if start_date != '' and end_date != '':
-        df=df[start_date:end_date]
-      #Control chart 1 
-      fig.append_trace(go.Box(
-                              x=df.index, y=df['Value'],name='value '+name,
-                              line=dict( color='#4280F5'),text=df['ID_No'],boxpoints='all'
-                              ),row=i, col=1)
-      #USL, LSL
-      fig.append_trace(go.Scatter(x=df.index, y=df['USL'],name='USL '+name, line=dict( color='#FF5733'),mode='lines'),row=i, col=1)
-      fig.append_trace(go.Scatter(x=df.index, y=df['LSL'],name='LSL '+name,line=dict( color='#FF5733'),mode='lines'),row=i, col=1)
-      fig.append_trace(go.Scatter(x=df.index, y=df['Nominal'],name='Nominal '+name,line=dict( color='#FF5733')),row=i, col=1)
-      i=i+1
 
-
-    fig.update_layout(height=200*len(df_dict), width=1200, title_text=material_name)
-    return fig
-
-fig_new_2=box_chart(base_file,name_list)    
-st.plotly_chart(fig_new_2)
-#----------------------------Box chart plotly Save-----------------------
-if st.checkbox('Save Box chart'):
-#if st.button("Save Line chart"):
-    fig_new_2.write_html(path3+material_name+'_box.html')
-    st.write('Path file: ',path3+material_name+'_box.html')
 #----------LINE CHART--------------------------------------------#
 st.header("Control chart (group value each day)")
 @st.cache(suppress_st_warning=True,allow_output_mutation=True)
@@ -447,6 +389,55 @@ if st.checkbox('Save Line chart'):
 #if st.button("Save Line chart"):
     fig_new.write_html(path3+material_name+'_line.html')
     st.write('Path file: ',path3+material_name+'_line.html')
+#---------------------------Box chart--------------------------------------#
+st.header("Box chart")
+@st.cache(suppress_st_warning=True,allow_output_mutation=True)
+def box_chart(base_file,name_list):
+    
+    df_dict=base_file
+    fig = make_subplots(          # Dim name
+        rows=len(df_dict), cols=1,
+        #shared_xaxes=True, # share same axis
+        #vertical_spacing=0.05, # adjust spacing between charts
+        #column_widths=[0.8, 0.2],
+        #subplot_titles=(list(df_dict.keys()))
+        subplot_titles=(name_list)
+    )
+    i=1
+    for name in list(df_dict.keys()): #also group
+      df=df_dict[name]
+      df=df.sort_values(by=['Date'])
+      non_object_column=list(df.select_dtypes(exclude=['object']).columns)
+      for a in df.columns[1:]:
+        if a in non_object_column :
+          df[a] = df[a].round(decimals=3)
+      df=df.reset_index(drop=True)
+      df=df.set_index('Date')
+      if start_date != '' and end_date != '':
+        df=df[start_date:end_date]
+      #Control chart 1 
+      fig.append_trace(go.Box(
+                              x=df.index, y=df['Value'],name='value '+name,
+                              line=dict( color='#4280F5'),text=df['ID_No'],boxpoints='all'
+                              ),row=i, col=1)
+      #USL, LSL
+      fig.append_trace(go.Scatter(x=df.index, y=df['USL'],name='USL '+name, line=dict( color='#FF5733'),mode='lines'),row=i, col=1)
+      fig.append_trace(go.Scatter(x=df.index, y=df['LSL'],name='LSL '+name,line=dict( color='#FF5733'),mode='lines'),row=i, col=1)
+      fig.append_trace(go.Scatter(x=df.index, y=df['Nominal'],name='Nominal '+name,line=dict( color='#FF5733')),row=i, col=1)
+      i=i+1
+
+
+    fig.update_layout(height=200*len(df_dict), width=1200, title_text=material_name)
+    return fig
+
+fig_new_2=box_chart(base_file,name_list)    
+st.plotly_chart(fig_new_2)
+#----------------------------Box chart plotly Save-----------------------
+if st.checkbox('Save Box chart'):
+#if st.button("Save Line chart"):
+    fig_new_2.write_html(path3+material_name+'_box.html')
+    st.write('Path file: ',path3+material_name+'_box.html')
+
 
 
 #---------------------------DataFrame----------------------------
