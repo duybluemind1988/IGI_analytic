@@ -23,8 +23,9 @@ st.title('Incoming material quality control')
 
 st.subheader('Created by: DNN')
 st.header("Information")
-
-text2= st.text_input("1. Please input folder name for data analysis (MUST)",'//Vn01w2k16v18/data/Copyroom/Test_software/Data/Membrane 3000S/')
+#path="//Vn01w2k16v18/data/Copyroom/Test_software/Data/Membrane 3000S/"
+path="/mnt/01D6B57CFBE4DB20/1.Linux/Data/IGI/IGI material Membrane 2019"
+text2= st.text_input("1. Please input folder name for data analysis (MUST)",path)
 path=text2 +'/'
 #path='//Vn01w2k16v18/data/Copyroom/Test_software/Data/Membrane 3000S/'
 #st.write('path input: '+path)
